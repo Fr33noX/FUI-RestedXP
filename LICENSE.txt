@@ -1,0 +1,85 @@
+================================================================================
+ FUI-RestedXP (standalone) — LICENSE
+================================================================================
+
+Copyright (c) 2026 Fr33noX. All rights reserved.
+
+
+1. ADDON CODE AND FILES — All Rights Reserved
+----------------------------------------------------------------
+
+This work — Lua source code, layout, original textures, documentation — is
+the property of Fr33noX.
+
+You may: download, install and use this addon with your World of Warcraft
+client.
+
+You may not: redistribute modified copies under your own name, sell or
+sublicense the addon in whole or in part, or reuse its sources in another
+project without the author's written permission.
+
+
+2. ATTRIBUTION — LiteTweaks (Jo)
+----------------------------------------------------------------
+
+The guide window reskin engine (Reskin.lua: the Frameless / Timeline /
+Compact / Zygor-style / 8-Bit layouts, the navigation arrows and their
+textures) is adapted from the RestedXP module of **LiteTweaks 1.46**, by
+**Jo**. The chevron / card / classic / zygor textures in Textures/ come from
+the same distribution.
+
+The original distribution carried no explicit license. **The author, Jo, has
+given explicit permission for this adaptation and its publication** (private
+message, October 2026); his rights in his original work remain his. This
+attribution is kept as thanks, and his interoperability request is honored:
+FUI-RestedXP warns the user when LiteTweaks' RestedXP reskin is running
+alongside (the two engines would otherwise fight over the same window). Any
+further request from the original author will be honored promptly — contact:
+the FUI-RestedXP CurseForge page.
+
+
+3. DERIVED ASSETS — RestedXP Guides (RXP)
+----------------------------------------------------------------
+
+Textures/rxp-arrow-v2.png is a tintable rebuild (white outline, alpha
+preserved, rescaled) of the v2 navigation arrow from RXPGuides' Blue theme;
+the original artwork belongs to the RestedXP team. It exists here only to
+color RestedXP's own guide window (when the "Fr33noX-UI" theme is selected
+in RXP). No other RXPGuides file is included: the integration goes through
+RXP's public interfaces only (RegisterTheme, ImportCustomThemes,
+RXPGuides_Themes, settings profile).
+
+
+4. THIRD-PARTY FONTS (Fonts/)
+----------------------------------------------------------------
+
+- Silkscreen-Regular.ttf / Silkscreen-Bold.ttf
+  SIL Open Font License 1.1 — full text included (Silkscreen-OFL.txt).
+- VT323-Regular.ttf
+  SIL Open Font License 1.1 — full text included (VT323-OFL.txt).
+- OverpassRegular.ttf
+  SIL Open Font License 1.1 (Overpass family, Delve Withrington).
+- Expressway.ttf / ExpresswayBold.ttf
+  Freeware typeface by Ray Larabie, redistributed unmodified; a classic in
+  World of Warcraft addons.
+
+
+5. WARRANTY DISCLAIMER
+----------------------------------------------------------------
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DAMAGES ARISING
+FROM ITS USE.
+
+World of Warcraft is a trademark of Blizzard Entertainment. FUI-RestedXP is
+not affiliated with or endorsed by Blizzard Entertainment, RestedXP or
+EllesmereUI.
+
+--------------------------------------------------------------------------------
+Résumé en français (non contractuel — la version anglaise ci-dessus fait foi)
+Addon © Fr33noX, tous droits réservés : usage personnel libre (télécharger,
+installer, jouer) ; pas de redistribution modifiée ni de réutilisation des
+sources sans autorisation écrite. Moteur de reskin adapté de LiteTweaks 1.46
+de Jo, avec son autorisation explicite. Flèche du thème reconstruite depuis
+l'art de RestedXP Guides. Polices : Silkscreen, VT323, Overpass (OFL 1.1),
+Expressway (freeware, R. Larabie). Fourni « en l'état ».
