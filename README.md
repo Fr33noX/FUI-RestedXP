@@ -1,267 +1,266 @@
-﻿# FUI-RestedXP
+# FUI-RestedXP
 
-Habillage **RestedXP Guides** (RXP) **autonome** (sans EllesmereUI)
-pour World of Warcraft **Forever** et **Midnight 12.1+** : thème, reskin de
-la fenêtre de guide, flèche de navigation et route sur la carte, le tout
-réglable dans sa propre fenêtre d'options (`/fuirxp`).
+Standalone **RestedXP Guides** (RXP) dressing (no EllesmereUI)
+for World of Warcraft **Forever** and **Midnight 12.1+**: theme, guide-window
+reskin, navigation arrow and map route, all adjustable in its own options
+window (`/fuirxp`).
 
-Auteur : **Fr33noX**. Le moteur de reskin de la fenêtre de guide (layouts,
-flèches, animations) est adapté du module RestedXP de **LiteTweaks 1.46**
-par Jo, avec son autorisation explicite. Si LiteTweaks est installé avec
-son reskin RestedXP actif, FUI-RestedXP le signale au login par une
-**popup à trois choix** (désactiver le reskin de LiteTweaks / celui de
-cet addon / garder les deux) ; des liens cliquables équivalents restent
-dans le chat.
+Author: **Fr33noX**. The guide-window reskin engine (layouts,
+arrows, animations) is adapted from the RestedXP module of **LiteTweaks 1.46**
+by Jo, with his explicit permission. If LiteTweaks is installed with
+its RestedXP reskin active, FUI-RestedXP reports it at login with a
+**three-choice popup** (disable LiteTweaks' reskin / this addon's one /
+keep both); equivalent clickable links remain in the chat.
 
-Le **cadre de la flèche de RestedXP** peut lui aussi être tenu transparent
-par quelque chose qui vit à côté : la nôtre est dessinée dedans, elle
-disparaît donc avec lui. FUI-RestedXP le signale au login — une fois, sans
-nommer personne et sans proposer de désactiver quoi que ce soit — et
-`/fuirxp status` en affiche l'état (« arrow frame: ok »). Tant que le cadre
-est ainsi tenu, les deux flèches ne peuvent pas coexister.
+The **RestedXP arrow frame** can also be held transparent
+by something living next to it: ours is drawn inside it, so it
+disappears along with it. FUI-RestedXP reports it at login — once, without
+naming anyone and without offering to disable anything — and
+`/fuirxp status` shows its state ("arrow frame: ok"). As long as the frame
+is held this way, both arrows cannot coexist.
 
-## Ce que fait l'addon
+## What the addon does
 
-1. **Thème RXP « Fr33noX-UI »** : un thème RestedXP dont les couleurs
-   (fonds, bords, pins de carte, tooltip) suivent **l'accent choisi sur la
-   page Theme** : orange feu par défaut (repris d'EllesmereUI
-   automatiquement s'il est installé), ou la *Custom Color* (*Follow
+1. **"Fr33noX-UI" RXP theme**: a RestedXP theme whose colors
+   (backgrounds, borders, map pins, tooltip) follow **the accent picked on the
+   Theme page**: fire orange by default (taken from EllesmereUI
+   automatically if installed), or the *Custom Color* (*Follow
    Accent* off).
-2. **Reskin de la fenêtre de guide** : panneaux sombres plats, bords fins
-   accent, bannières teintées accent, flèche de navigation teintée. Le
-   reskin est ré-appliqué après chaque repaint de RXP (hooks sur
-   `UpdateVisuals` / `UpdateFrame` / `UpdateText`, debouncés à une fois par
-   frame), et cède la place quand vous choisissez un autre thème RXP.
-3. **Fenêtre d'options autonome** : pages Reskin / Map / Theme / Changelog,
-   recherche globale sur les réglages, échelle de la fenêtre (curseur
-   Échelle, 60–130 %), fenêtre redimensionnable — sans aucune dépendance
-hors RestedXP Guides.
+2. **Guide window reskin**: flat dark panels, thin accent
+   borders, accent-tinted banners, tinted navigation arrow. The
+   reskin is re-applied after every RXP repaint (hooks on
+   `UpdateVisuals` / `UpdateFrame` / `UpdateText`, debounced to once per
+   frame), and steps aside when you pick another RXP theme.
+3. **Standalone options window**: Reskin / Map / Theme / Changelog pages,
+   global settings search, window scale (Scale
+   slider, 60–130%), resizable window — with no dependency
+   beyond RestedXP Guides.
 
 ## Installation
 
-1. Copiez le dossier `FUI-RestedXP` dans le dossier `Interface\AddOns`
-   de votre client WoW (celui qui contient déjà le dossier `RXPGuides`).
-2. Relancez le jeu ou faites `/reload`.
-3. Sélectionnez le thème **"Fr33noX-UI by FUI-RestedXP"** dans
-   `RXP Settings > Guide Window > Theme` — ou cliquez simplement
-   **Activate in RestedXP** sur la page *Theme* des options (bouton qui
-   fait la sélection pour vous). Un indicateur de statut y montre si le
-   thème est bien actif.
-   > La page *Theme* pilote **toutes** les couleurs de l'addon (thème RXP,
-   reskin Classic, teinte de flèche) via une source unique : l'accent
-   (*Follow Accent*, défaut) ou la *Custom Color*.
-4. **Réglages** : `/fuirxp` ouvre la fenêtre d'options, avec les pages
-   Reskin / Map / Theme / Changelog et un champ de recherche global.
-   > La barre d'onglets du module ne montre que la page d'apparence du
-   > **layout actif** (Timeline sélectionné → seul l'onglet Timeline ;
-   > RestedXP d'origine ou moteur désactivé → aucun). Le changement de layout
-   > ou le toggle « Reskin RestedXP » reconstruit la barre immédiatement.
+1. Copy the `FUI-RestedXP` folder into your WoW client's `Interface\AddOns`
+   folder (the one that already contains the `RXPGuides` folder).
+2. Restart the game or run `/reload`.
+3. Select the **"Fr33noX-UI by FUI-RestedXP"** theme in
+   `RXP Settings > Guide Window > Theme` — or simply click
+   **Activate in RestedXP** on the options *Theme* page (a button that
+   makes the selection for you). A status indicator shows whether the
+   theme is properly active.
+   > The *Theme* page drives **all** of the addon's colors (RXP theme,
+   Classic reskin, arrow tint) from a single source: the accent
+   (*Follow Accent*, default) or the *Custom Color*.
+4. **Settings**: `/fuirxp` opens the options window, with the
+   Reskin / Map / Theme / Changelog pages and a global search field.
+   > The module's tab bar only shows the appearance page of the
+   > **active layout** (Timeline selected → only the Timeline tab;
+   > stock RestedXP or disabled engine → none). Changing layout
+   > or toggling "Reskin RestedXP" rebuilds the bar immediately.
 
-## Commandes
+## Commands
 
-- `/fuirxp` : ouvre la fenêtre d'options
-- `/fuirxp status` : état de l'addon et couleur accent détectée
-- `/fuirxp reset` : remettre les réglages par défaut
+- `/fuirxp`: opens the options window
+- `/fuirxp status`: addon state and detected accent color
+- `/fuirxp reset`: restore default settings
 
-## Réinitialisation
+## Reset
 
-Le bouton **Reset to Defaults** (page *Reskin*) restaure **toute** la
- configuration de l'addon :
- layout, style de flèche et ses couleurs, opacité de fenêtre, source de
- couleur du thème, numéros d'étapes, étapes listées, tailles, polices,
- unité de distance — et remet l'échelle de la fenêtre RXP à 100 %.
- Les réglages propres à RestedXP (position de fenêtre, guides suivis) ne
- sont pas touchés.
+The **Reset to Defaults** button (*Reskin* page) restores **all** of the
+ addon's configuration:
+ layout, arrow style and its colors, window opacity, theme
+ color source, step numbers, listed steps, sizes, fonts,
+ distance unit — and puts the RXP window scale back to 100%.
+ RestedXP's own settings (window position, followed guides) are
+ left untouched.
 
-## Réglages (FUIRestedXPCache, éditable dans WTF)
+## Settings (FUIRestedXPCache, editable in WTF)
 
-- `rxpLayout` : le look de la fenêtre de guide —
-  `FRAMELESS` (texte contourné
-  sur le monde), `TIMELINE` (fenêtre à ligne numérotée), `COMPACT`
-  (barre de titre « ‹ 2/189 › », icônes RXP par ligne, barre de
-  progression), `ZYGOR` (style Zygor : onglet, objectifs sur bande rouge,
-  barre verte), `BIT8` (quest log pixel-art : Silkscreen/VT323, scanlines
-  CRT, boutons ◀ B / A ▶) ou `DEFAULT` (fenêtre de RXP intacte).
-- **Dans tous les layouts** : clic gauche sur une étape en cours = la
-  sauter (animation verte « Skipped »), clic droit = revenir à l'étape
-  précédente (retour animé « Back ») ; molette = faire défiler la liste ;
-  double-clic sur une étape listée = y aller. Chaque layout a sa propre
-  page d'apparence dans la fenêtre d'options (polices, tailles, fondu,
-  couleurs).
-- `rxpArrowStyle` : la flèche de navigation, **l'ensemble complet** —
-  `LAYOUT` (celle du layout), `CHEVRON`, `CARD`, `CLASSIC`
-  (flèche 3D ombrée : verte face au point, jaune de côté, rouge dos),
-  `ZYGOR` (flèche façon Zygor + temps restant), `RAIL` (tête d'aiguille
-  pliée, moitié sombre = relief ; défaut du layout Rail) ou `RAILC` (la même
-  idée dans un anneau, aiguille à deux facettes). Card se teinte par la
-  distance (rouge > 100, jaune, vert < 30).
-- `rxpMeters` : distance de la flèche en « m » (1 yd = 1 m dans WoW : seul
-  le label change). Fonctionne avec la flèche du moteur (Custom Arrow on)
-  **et** avec la flèche d'origine de RXP (Custom Arrow off — réécriture en
-  direct du texte « 177yd » de RXP).
-- `rxpBoxLock` (défaut : true) : **les icônes d'objectif collées à la fenêtre**.
-  Les boîtes de cibles et d'objets de RestedXP restent sous la fenêtre de
-  guide et la suivent dans tous les layouts. décoché, on les déplace au
-  glisser gauche n'importe où sur l'écran et elles y restent — dans tous les
-  layouts et d'une session à l'autre (position enregistrée en `rxpBoxFree`).
-- `rxpArrowETA` (défaut : true) : le temps restant (« 1:23 » / « 45s », en
-  jaune) sur **toutes** les flèches personnalisées (Chevron, Card, Classic,
-  Zygor-style, Rail, Rail Compass). Off = la distance seule.
-- Polices : la clé `uiFont` (page *Theme*, ligne **Default Font**, défaut :
-  **Overpass**) est la police de toute l'interface de l'addon. Les looks
-  (`rxpFlFont`/`rxpCpFont`/`rxpZgFont`/`rxpTlFont`...) suivent cette même
-  police par défaut via le choix **FUI Global Font** (l'entrée renommée
-  d'anciennes « EUI Global Font » ; une police choisie explicitement sur
-  une page de look reste pinée). Le 8-Bit garde ses polices pixel
-  (Silkscreen / VT323).
-- `skinForceClassic` (défaut : true) : garde la **fenêtre guide classique**
-  de RXP disponible. ⚠️ L'option **"Guide Window v2"** (Interface V2, Beta)
-  de RXP **cache entièrement** la fenêtre classique (fenêtre, étapes,
-  barre de défilement) : le reskin Classic comme les autres layouts n'ont
-  alors plus rien à habiller ni à lire. Avec cette option, l'addon détecte
-  v2, le désactive et affiche un message (un `/reload` achève la
-  restauration) ; passez-la à false pour laisser v2 tourner.
-- `rxpHideNums` : masque les numéros d'étapes et la ligne verticale
-- `rxpUpcoming` : nombre d'étapes à venir listées — **0** les masque
-  totalement (le header "Step X of Y" et le % restent)
-- La **seule habillage personnalisé** est le **thème** (page *Theme*) :
-  « Fr33noX-UI by FUI-RestedXP », dont les couleurs suivent l'accent
-  (*Follow Accent*, défaut) ou la *Custom Color*. Tout le reste
-  de la fenêtre est le moteur de reskin, inchangé. Quand ce thème est
-  sélectionné dans RXP et que la flèche personnalisée est désactivée
-  (ou layout RestedXP d'origine), la **flèche lisible du thème Blue** de
-  RXP (fichier v2) est utilisée et teintée avec la même couleur (accent
-  live ou custom) au lieu de la flèche sombre du jeu de textures DarkMode.
-- `themeFollowAccent` : le thème suit l'accent (défaut : true)
-- `themeR/G/B` : couleur custom quand `themeFollowAccent` est false
+- `rxpLayout`: the guide window look —
+  `FRAMELESS` (outlined text
+  over the world), `TIMELINE` (numbered-line window), `COMPACT`
+  ("‹ 2/189 ›" title bar, per-line RXP icons, progress
+  bar), `ZYGOR` (Zygor style: tab, objectives on a red band,
+  green bar), `BIT8` (pixel-art quest log: Silkscreen/VT323, CRT scanlines,
+  ◀ B / A ▶ buttons) or `DEFAULT` (RXP window untouched).
+- **In every layout**: left-click a current step =
+  skip it (green "Skipped" animation), right-click = go back to the previous
+  step (animated "Back"); mouse wheel = scroll the list;
+  double-click a listed step = jump to it. Each layout has its own
+  appearance page in the options window (fonts, sizes, fade,
+  colors).
+- `rxpArrowStyle`: the navigation arrow, **the full set** —
+  `LAYOUT` (the layout's own), `CHEVRON`, `CARD`, `CLASSIC`
+  (shaded 3D arrow: green when facing the point, yellow from the side, red from behind),
+  `ZYGOR` (Zygor-style arrow + time remaining), `RAIL` (bent needle head,
+  dark half = relief; default of the Rail layout) or `RAILC` (the same
+  idea inside a ring, two-facet needle). Card is tinted by
+  distance (red > 100, yellow, green < 30).
+- `rxpMeters`: arrow distance in "m" (1 yd = 1 m in WoW: only
+  the label changes). Works with the engine arrow (Custom Arrow on)
+  **and** with RXP's stock arrow (Custom Arrow off — live
+  rewrite of RXP's "177yd" text).
+- `rxpBoxLock` (default: true): **objective icons pinned to the window**.
+  RestedXP's target and item boxes stay under the guide
+  window and follow it in every layout. When unchecked, drag them with
+  left-drag anywhere on screen and they stay there — in every
+  layout and across sessions (position saved in `rxpBoxFree`).
+- `rxpArrowETA` (default: true): remaining time ("1:23" / "45s", in
+  yellow) on **all** custom arrows (Chevron, Card, Classic,
+  Zygor-style, Rail, Rail Compass). Off = distance only.
+- Fonts: the `uiFont` key (*Theme* page, **Default Font** row, default:
+  **Overpass**) is the font of the whole addon UI. Looks
+  (`rxpFlFont`/`rxpCpFont`/`rxpZgFont`/`rxpTlFont`...) follow that same
+  font by default via the **FUI Global Font** choice (the renamed
+  entry of the old "EUI Global Font"; a font explicitly picked on
+  a look page stays pinned). 8-Bit keeps its pixel
+  fonts (Silkscreen / VT323).
+- `skinForceClassic` (default: true): keeps RXP's **classic guide window**
+  available. ⚠️ RXP's **"Guide Window v2"** option (V2 UI, Beta)
+  **fully hides** the classic window (window, steps,
+  scrollbar): the Classic reskin and the other layouts then have nothing left
+  to dress or read. With this option, the addon detects
+  v2, disables it and shows a message (a `/reload` completes the
+  restore); set it to false to let v2 run.
+- `rxpHideNums`: hides step numbers and the vertical line
+- `rxpUpcoming`: number of upcoming steps listed — **0** hides them
+  entirely (the "Step X of Y" header and % remain)
+- The **only custom skin** is the **theme** (*Theme* page):
+  "Fr33noX-UI by FUI-RestedXP", whose colors follow the accent
+  (*Follow Accent*, default) or the *Custom Color*. Everything else
+  in the window is the reskin engine, unchanged. When this theme is
+  selected in RXP and the custom arrow is disabled
+  (or stock RestedXP layout), RXP's readable **Blue theme arrow**
+  (v2 file) is used and tinted with the same color (live
+  accent or custom) instead of the DarkMode texture set's dark arrow.
+- `themeFollowAccent`: the theme follows the accent (default: true)
+- `themeR/G/B`: custom color when `themeFollowAccent` is false
 
-## Dépannage
+## Troubleshooting
 
-- Le bouton **Activate in RestedXP** (page Theme) doit répondre
-  "theme activated". S'il répond que RXP n'est pas chargé, ouvrez une fois
-  les réglages de RestedXP (pour initialiser son profil), puis réessayez.
-- Le thème apparaît dans le dropdown de RXP comme
-  **"Fr33noX-UI by FUI-RestedXP"**. S'il manque : vérifiez que RXPGuides
-  est bien installé dans la même instance de jeu que FUI-RestedXP.
+- The **Activate in RestedXP** button (Theme page) should answer
+  "theme activated". If it says RXP is not loaded, open
+  RestedXP's settings once (to initialize its profile), then retry.
+- The theme shows up in RXP's dropdown as
+  **"Fr33noX-UI by FUI-RestedXP"**. If missing: check that RXPGuides
+  is installed in the same game instance as FUI-RestedXP.
 
 ## Version
 
-**Dernière version : 1.1.0** — première publication de la **version
-autonome** : aucune dépendance hors RestedXP Guides, fenêtre d'options
-propre (Reskin / Map / Theme / Changelog, recherche globale, échelle
-60–130 %, redimensionnable), commandes `/fuirxp`. Le contenu reprend la
-1.1.0 : la **route sur la carte du monde** (page MAP, désactivée par défaut)
-— une droite de vous vers l'objectif courant, dans la couleur d'accent,
-avec au choix les six objectifs suivants enchaînés derrière — et **la même
-route sur la minimap** ; les **superpositions du guide** (circuits de farm,
-patrouilles, zones de recherche) avec leurs couleurs propres et une opacité
-commune ; les **info-bulles sur les marqueurs** de la carte (étape,
-distance, direction, ETA, quête) ; l'**ombre floue de la flèche** dans le
-bloc Flèche (expansion et couleur, désactivée par défaut) ; la **ligne de
-récupération de cadavre** ; l'avertissement quand le cadre de la flèche est
-tenu transparent de l'extérieur ; et les correctifs : compteur d'objectif
-affiché deux fois, et ETA au-delà d'une heure (« 1:01:01 » au lieu
-de « 61:01 »). Le détail est dans l'onglet Changelog (`/fuirxp`).
+**Latest version: 1.1.0** — first release of the **standalone
+version**: no dependency beyond RestedXP Guides, its own options
+window (Reskin / Map / Theme / Changelog, global search, 60–130 %
+scale, resizable), `/fuirxp` commands. Content matches
+1.1.0: the **world map route** (MAP page, disabled by default)
+— a straight line from you to the current objective, in the accent color,
+with optionally the next six objectives chained behind — and **the same
+route on the minimap**; **guide overlays** (farm circuits,
+patrols, search zones) with their own colors and a shared
+opacity; **tooltips on map markers** (step,
+distance, direction, ETA, quest); the arrow's **blurred shadow** in the
+Arrow block (spread and color, disabled by default); the **corpse-recovery
+line**; the warning when the arrow frame is held
+transparent from the outside; and fixes: duplicated objective
+counter, and ETA beyond one hour ("1:01:01" instead
+of "61:01"). Details are in the Changelog tab (`/fuirxp`).
 
-## Compatibilité
+## Compatibility
 
-- **RestedXP Guides** doit être installé (l'addon ne fait que l'habiller).
-- Aucune autre dépendance : EllesmereUI n'est ni requis ni utilisé — s'il
-  est présent, son accent est repris comme accent par défaut.
-- Clients : Forever (16001) et Midnight (120000-120100).
-- Le code ne touche jamais aux fichiers de RXP : tout passe par ses API
-  publiques (`RegisterTheme`, global `RXPGuides_Themes`) et des hooks.
+- **RestedXP Guides** must be installed (the addon only dresses it up).
+- No other dependency: EllesmereUI is neither required nor used — if
+  present, its accent is reused as the default accent.
+- Clients: Forever (16001) and Midnight (120000-120100).
+- The code never touches RXP's files: everything goes through its public
+  APIs (`RegisterTheme`, `RXPGuides_Themes` global) and hooks.
 
-## Licence
+## License
 
-Voir [LICENSE.txt](LICENSE.txt). Addon fourni « en l'état », tous droits
-réservés (Fr33noX), avec attribution : moteur de reskin adapté de
-LiteTweaks 1.46 par Jo, avec son autorisation explicite ; flèche de thème
-reconstruite depuis l'art de RestedXP Guides ; polices tiers sous leurs
-licences propres (OFL pour Silkscreen, VT323 et Overpass).
+See [LICENSE.txt](LICENSE.txt). Addon provided "as is", all rights
+reserved (Fr33noX), with attribution: reskin engine adapted from
+LiteTweaks 1.46 by Jo, with his explicit permission; theme arrow
+rebuilt from RestedXP Guides art; third-party fonts under their
+own licenses (OFL for Silkscreen, VT323 and Overpass).
 
-## Historique (série 3.4.x)
+## History (3.4.x series)
 
-3.4.17 — la teinte de flèche suit à nouveau l'accent EUI en direct
-(ré-enregistrement à l'API skin d'EUI perdu au changement de moteur), et se
-ré-applique dès l'activation du thème.
+3.4.17 — arrow tint follows the live EUI accent again
+(re-registered with EUI's skin API after the engine change), and is
+re-applied as soon as the theme is activated.
 
-3.4.16 — la flèche teintée par le thème utilise le fichier v2 (thème Blue,
-lisible) au lieu de la flèche sombre de DarkMode.
+3.4.16 — the theme-tinted arrow uses the v2 file (Blue theme,
+readable) instead of DarkMode's dark arrow.
 
-3.4.15 — « Reskin RestedXP » est en tête de la page Reskin : quand il est
-désactivé, les blocs Layout et Arrow disparaissent de la page. Le toggle
-Guide Window prévient désormais qu'un /reload est nécessaire dans les deux
-sens (la v2 de RXP détruit les scripts de la fenêtre classique).
+3.4.15 — "Reskin RestedXP" is at the top of the Reskin page: when it is
+disabled, the Layout and Arrow blocks disappear from the page. The
+Guide Window toggle now warns that a /reload is needed both ways
+(RXP's v2 destroys the classic window's scripts).
 
-3.4.14 — la page Reskin regroupe les réglages de flèche dans leur propre
-bloc « ARROW » (Custom Arrow, Arrow Style, Meters, Time to Waypoint).
+3.4.14 — the Reskin page groups arrow settings in their own
+"ARROW" block (Custom Arrow, Arrow Style, Meters, Time to Waypoint).
 
-3.4.13 — le statut du thème (« Color source ») se met à jour aussi quand
-on bascule « Follow Accent ».
+3.4.13 — the theme status ("Color source") also updates when
+toggling "Follow Accent".
 
-3.4.12 — boutons Activate / Deactivate côte à côte sur la page Theme, et
-le statut du thème se rafraîchit dès le clic.
+3.4.12 — Activate / Deactivate buttons side by side on the Theme page, and
+the theme status refreshes on click.
 
-3.4.11 — bouton « Deactivate in RestedXP » sur la page Theme : rend la
-fenêtre au thème d'origine de RXP (RXP Blue) sans ouvrir ses réglages.
+3.4.11 — "Deactivate in RestedXP" button on the Theme page: hands the
+window back to RXP's stock theme (RXP Blue) without opening its settings.
 
-3.4.10 — la flèche d'origine de RXP suit la couleur de la page Theme
-(accent EUI live ou couleur custom) au lieu de rester noire.
+3.4.10 — RXP's stock arrow follows the Theme page color
+(live EUI accent or custom color) instead of staying black.
 
-3.4.9 — la barre d'onglets des options EUI ne montre plus que la page
-d'apparence du layout actif (une seule à la fois).
+3.4.9 — the EUI options tab bar only shows the appearance page
+of the active layout (one at a time).
 
-3.4.8 — « Time to Waypoint » étendu à **toutes** les flèches
-personnalisées (Chevron, Card, Classic 3D, Zygor-style).
+3.4.8 — "Time to Waypoint" extended to **all** custom
+arrows (Chevron, Card, Classic 3D, Zygor-style).
 
-3.4.7 — option « Time to Waypoint » pour afficher ou masquer le temps
-restant de la flèche Zygor-style.
+3.4.7 — "Time to Waypoint" option to show or hide the
+Zygor-style arrow's remaining time.
 
-3.4.6 — le texte de distance/temps est de retour sur **toutes** les flèches
-(le motif du 3.4.5 n'acceptait qu'une lettre d'unité et rejetait « yd »).
+3.4.6 — distance/time text is back on **all** arrows
+(the 3.4.5 pattern only accepted a single-letter unit and rejected "yd").
 
-3.4.5 — réparation du temps restant (« 1:23 » / « 45s ») de la flèche
-Zygor-style : le parseur du moteur accepte de nouveau les deux unités et le
-label de flèche est réécrit dans les deux sens (yd ↔ m), sans boucle.
+3.4.5 — fixed the Zygor-style arrow's remaining time ("1:23" / "45s"):
+the engine parser accepts both units again and the
+arrow label is rewritten both ways (yd ↔ m), loop-free.
 
-3.4.4 — « Meters (m) on the Arrow » fonctionne à nouveau quand
-« Custom Arrow » est désactivé (réécriture en direct du texte de flèche de
-RXP, sans conflit avec la carte du moteur).
+3.4.4 — "Meters (m) on the Arrow" works again when
+"Custom Arrow" is disabled (live rewrite of RXP's arrow text,
+no conflict with the engine map).
 
-## Fichiers
+## Files
 
-- `Core.lua` - DB, accent, détection du chargement de RXP, slash,
-  polices embarquées (Overpass / Expressway)
-- `Theme.lua` - thème RXP dérivé de l'accent (canaux officiels)
-- `Skin.lua` - garde-fou Guide Window v2, réécriture d'unité de distance,
-  activation/désactivation du thème, teinte de flèche
-- `Reskin.lua` - moteur complet de reskin (adapté de LiteTweaks 1.46, voir
-  ci-dessus) : cinq layouts
-  maison (**Frameless**, **Timeline**, **Compact**, **Zygor-style**,
-  **8-Bit**, **Rail**), animations de cartes
-  (sauter/revenir), icônes RXP par ligne, barres de progression, boîtes
-  Active Targets/Items, désactivation des annonces RXP, flèches de
-  navigation universelles (dont TomTom et Zygor Stealth réelles), couleurs
-  noms ennemis/objets
-- `MapRoute.lua` - route sur la carte du monde : droite du joueur vers
-  l'objectif courant du guide, puis les étapes suivantes enchaînées, le tout
-  dans la couleur d'accent. Chaque étape est entourée d'un cercle (huit
-  points sur la circonférence plus un au centre), des chevrons
-  (`rxp-chevron.png`) parcourent le trait pour porter la direction, chaque
-  segment porte un halo sombre et son épaisseur suit le zoom. Les coordonnées sont
-  lues dans les données de RestedXP (jamais écrites) et le tracé est fait
-  sur le canvas de la carte, donc il suit le zoom et le panoramique. Les
-  traits ne prélevent que l'intérieur plat d'une texture blanche du jeu, donc
-  son bord n'est jamais étiré sur la carte. Désactivée par défaut
-  (page MAP des options)
-- `Textures/` - les textures du moteur (chevron, flèches card /
-  classic / zygor, check, back, prev, next, tri, flèche de thème HQ)
-- `Options.lua` - fenêtre de réglages autonome (recherche, échelle,
-  redimensionnement)
-- `OptionsView.lua` / `Controls.lua` - moteur de la fenêtre : lignes
-  (toggles, sliders à rail étirable, listes, couleurs) et widgets
-- `FUIOptions.lua` - pages de réglages : Reskin, Map (route carte du
-  monde + minimap), Theme (accent, police), Changelog, et une page
-d'apparence par layout actif
-- `About.lua` - page d'accueil de la fenêtre d'options
+- `Core.lua` - DB, accent, RXP load detection, slash,
+  embedded fonts (Overpass / Expressway)
+- `Theme.lua` - RXP theme derived from the accent (official channels)
+- `Skin.lua` - Guide Window v2 guard, distance-unit rewrite,
+  theme enable/disable, arrow tint
+- `Reskin.lua` - full reskin engine (adapted from LiteTweaks 1.46, see
+  above): five in-house
+  layouts (**Frameless**, **Timeline**, **Compact**, **Zygor-style**,
+  **8-Bit**, **Rail**), card animations
+  (skip/back), per-line RXP icons, progress bars, Active
+  Targets/Items boxes, RXP announcement muting, universal
+  navigation arrows (including real TomTom and Zygor Stealth ones), enemy/item
+  name colors
+- `MapRoute.lua` - world map route: straight line from the player to
+  the guide's current objective, then the following steps chained, all
+  in the accent color. Each step is ringed with a circle (eight
+  points on the circumference plus one at the center), chevrons
+  (`rxp-chevron.png`) run along the line to carry direction, each
+  segment carries a dark halo and its thickness follows zoom. Coordinates are
+  read from RestedXP data (never written) and drawing happens
+  on the map canvas, so it follows zoom and pan.
+  Lines only sample the flat interior of a white game texture, so
+  its edge is never stretched across the map. Disabled by default
+  (options MAP page)
+- `Textures/` - engine textures (chevron, card /
+  classic / zygor arrows, check, back, prev, next, tri, HQ theme arrow)
+- `Options.lua` - standalone settings window (search, scale,
+  resizing)
+- `OptionsView.lua` / `Controls.lua` - window engine: rows
+  (toggles, stretchable-rail sliders, lists, colors) and widgets
+- `FUIOptions.lua` - settings pages: Reskin, Map (world
+  map route + minimap), Theme (accent, font), Changelog, plus one
+  appearance page per active layout
+- `About.lua` - options window home page
