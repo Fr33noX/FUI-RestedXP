@@ -240,6 +240,8 @@ ns.defaults = {
     rxpTlArrowR = 0.35, rxpTlArrowG = 0.65, rxpTlArrowB = 1, rxpTlArrowA = 1,
     rxpTlDoneColR = 0.37, rxpTlDoneColG = 0.88, rxpTlDoneColB = 0.48, rxpTlDoneColA = 1,
     rxpTlEnemyR = 1, rxpTlEnemyG = 0.341, rxpTlEnemyB = 0.133, rxpTlEnemyA = 1,
+    rxpTlFriendlyR = 0, rxpTlFriendlyG = 1, rxpTlFriendlyB = 0.145, rxpTlFriendlyA = 1,   -- #00FF25
+    rxpTlWarnR = 0.988, rxpTlWarnG = 0.863, rxpTlWarnB = 0, rxpTlWarnA = 1,               -- #FCDC00
     rxpTlTextR = 0.62, rxpTlTextG = 0.62, rxpTlTextB = 0.62, rxpTlTextA = 1,
     rxpTlNumR = 0.62, rxpTlNumG = 0.62, rxpTlNumB = 0.62, rxpTlNumA = 1,
     rxpTlMutedR = 0.78, rxpTlMutedG = 0.78, rxpTlMutedB = 0.78, rxpTlMutedA = 1,
@@ -259,6 +261,8 @@ ns.defaults = {
     rxpCpArrowR = 0.24, rxpCpArrowG = 0.86, rxpCpArrowB = 0.42, rxpCpArrowA = 1,
     rxpCpDoneColR = 0.24, rxpCpDoneColG = 0.86, rxpCpDoneColB = 0.42, rxpCpDoneColA = 1,
     rxpCpEnemyR = 1, rxpCpEnemyG = 0.341, rxpCpEnemyB = 0.133, rxpCpEnemyA = 1,
+    rxpCpFriendlyR = 0, rxpCpFriendlyG = 1, rxpCpFriendlyB = 0.145, rxpCpFriendlyA = 1,   -- #00FF25
+    rxpCpWarnR = 0.988, rxpCpWarnG = 0.863, rxpCpWarnB = 0, rxpCpWarnA = 1,               -- #FCDC00
     rxpCpTextR = 0.84, rxpCpTextG = 0.87, rxpCpTextB = 0.89, rxpCpTextA = 1,
     rxpCpNumR = 0.6, rxpCpNumG = 0.64, rxpCpNumB = 0.68, rxpCpNumA = 1,
     rxpCpMutedR = 0.73, rxpCpMutedG = 0.76, rxpCpMutedB = 0.8, rxpCpMutedA = 1,
@@ -283,6 +287,8 @@ ns.defaults = {
     rxpZgArrowR = 0.3, rxpZgArrowG = 0.85, rxpZgArrowB = 0.3, rxpZgArrowA = 1,
     rxpZgDoneColR = 0.3, rxpZgDoneColG = 0.85, rxpZgDoneColB = 0.3, rxpZgDoneColA = 1,
     rxpZgEnemyR = 1, rxpZgEnemyG = 0.341, rxpZgEnemyB = 0.133, rxpZgEnemyA = 1,
+    rxpZgFriendlyR = 0, rxpZgFriendlyG = 1, rxpZgFriendlyB = 0.145, rxpZgFriendlyA = 1,   -- #00FF25
+    rxpZgWarnR = 0.988, rxpZgWarnG = 0.863, rxpZgWarnB = 0, rxpZgWarnA = 1,               -- #FCDC00
     rxpZgTextR = 0.9, rxpZgTextG = 0.9, rxpZgTextB = 0.9, rxpZgTextA = 1,
     rxpZgNumR = 0.6, rxpZgNumG = 0.6, rxpZgNumB = 0.6, rxpZgNumA = 1,
     rxpZgMutedR = 0.72, rxpZgMutedG = 0.72, rxpZgMutedB = 0.72, rxpZgMutedA = 1,
@@ -304,6 +310,7 @@ ns.defaults = {
     rxpBtArrowR = 1, rxpBtArrowG = 0.824, rxpBtArrowB = 0.247, rxpBtArrowA = 1,
     rxpBtDoneColR = 0.49, rxpBtDoneColG = 1, rxpBtDoneColB = 0.416, rxpBtDoneColA = 1,        -- #7DFF6A
     rxpBtEnemyR = 1, rxpBtEnemyG = 0.365, rxpBtEnemyB = 0.451, rxpBtEnemyA = 1,               -- #FF5D73
+    rxpBtWarnR = 0.988, rxpBtWarnG = 0.863, rxpBtWarnB = 0, rxpBtWarnA = 1,                   -- #FCDC00
     rxpBtItemR = 0.247, rxpBtItemG = 0.816, rxpBtItemB = 1, rxpBtItemA = 1,                   -- #3FD0FF
     rxpBtNpcR = 0.49, rxpBtNpcG = 1, rxpBtNpcB = 0.416, rxpBtNpcA = 1,                        -- #7DFF6A
     rxpBtVerbR = 1, rxpBtVerbG = 0.824, rxpBtVerbB = 0.247, rxpBtVerbA = 1,                   -- #FFD23F
@@ -338,6 +345,8 @@ ns.defaults = {
     rxpFlArrowR = 0, rxpFlArrowG = 0.85, rxpFlArrowB = 1, rxpFlArrowA = 1,      -- arrow, same yellow
     rxpFlDoneColR = 0.37, rxpFlDoneColG = 0.88, rxpFlDoneColB = 0.48, rxpFlDoneColA = 1,  -- finished objective bars
     rxpFlEnemyR = 0, rxpFlEnemyG = 0.511, rxpFlEnemyB = 0.6, rxpFlEnemyA = 1,       -- enemy names (RestedXP's #FF5722)
+    rxpFlFriendlyR = 0, rxpFlFriendlyG = 1, rxpFlFriendlyB = 0.145, rxpFlFriendlyA = 1,   -- #00FF25
+    rxpFlWarnR = 0.988, rxpFlWarnG = 0.863, rxpFlWarnB = 0, rxpFlWarnA = 1,               -- #FCDC00
     rxpFlTextR = 0.475, rxpFlTextG = 0.475, rxpFlTextB = 0.475, rxpFlTextA = 1,          -- #F0F0F0
     rxpFlNumR = 0.475, rxpFlNumG = 0.475, rxpFlNumB = 0.475, rxpFlNumA = 1,              -- #BBBBBB
     rxpFlMutedR = 0.87, rxpFlMutedG = 0.87, rxpFlMutedB = 0.87, rxpFlMutedA = 1,      -- #DDDDDD
@@ -362,6 +371,8 @@ ns.defaults = {
     rxpRlArrowR = 0.35, rxpRlArrowG = 0.75, rxpRlArrowB = 0.95, rxpRlArrowA = 1,      -- arrow, the rail's blue
     rxpRlDoneColR = 0.3, rxpRlDoneColG = 0.85, rxpRlDoneColB = 0.4, rxpRlDoneColA = 1,  -- finished objective bars
     rxpRlEnemyR = 0, rxpRlEnemyG = 0.511, rxpRlEnemyB = 0.6, rxpRlEnemyA = 1,       -- enemy names
+    rxpRlFriendlyR = 0, rxpRlFriendlyG = 1, rxpRlFriendlyB = 0.145, rxpRlFriendlyA = 1,   -- #00FF25
+    rxpRlWarnR = 0.988, rxpRlWarnG = 0.863, rxpRlWarnB = 0, rxpRlWarnA = 1,               -- #FCDC00
     rxpRlTextR = 0.82, rxpRlTextG = 0.85, rxpRlTextB = 0.88, rxpRlTextA = 1,           -- upcoming steps
     rxpRlNumR = 0.5, rxpRlNumG = 0.55, rxpRlNumB = 0.6, rxpRlNumA = 1,                -- upcoming numbers
     rxpRlMutedR = 0.62, rxpRlMutedG = 0.66, rxpRlMutedB = 0.7, rxpRlMutedA = 1,       -- markers, counter, notes
@@ -369,7 +380,7 @@ ns.defaults = {
     rxpUpcoming = 6,                    -- steps listed under the current ones
     rxpArrow = true,                    -- reskin the waypoint arrow
     rxpBoxLock = true,                   -- true: the objective icon boxes stay glued under the guide window; false: drag them anywhere
-    rxpArrowStyle = "LAYOUT",           -- LAYOUT (the layout's own), CHEVRON, CARD, CLASSIC, ZYGOR, RAIL or RAILC
+    rxpArrowStyle = "LAYOUT",           -- LAYOUT (the layout's own), CHEVRON, CARD, CLASSIC, ZYGOR, RAIL, RAILC or WAYPOINT
     rxpMeters = false,                  -- the arrow's distance in "m" (1 yd = 1 m in WoW: same number)
     rxpArrowETA = true,                 -- every custom arrow shows the time to the waypoint (x:xx / xx s)
     rxpArrowShadow = false,             -- a soft blurred shadow around the arrow's icon (ARROW block)
@@ -381,9 +392,9 @@ ns.defaults = {
     -- two surfaces this addon does not own (a UI suite may style both),
     -- and nothing
     -- else here depends on them.
-    rxpMapRoute = false,
-    rxpMiniRoute = false,               -- the same route on the minimap, switch of its own (ROUTE block)
-    rxpMapFuture = 0,                   -- extra markers drawn on the map, after the current target (0..6)
+    rxpMapRoute = true,
+    rxpMiniRoute = true,                -- the same route on the minimap, switch of its own (ROUTE block)
+    rxpMapFuture = 6,                   -- extra markers drawn on the map, after the current target (0..6)
     rxpMapChainAlpha = 0.55,            -- how present the chain of upcoming steps is against the current target
     rxpMapFlowSpeed = 0.5,              -- chevron travel along the route (0 = still), the value this route was drawn against
     rxpMapThickness = 1.0,              -- line weight on BOTH surfaces (1 = the route exactly as it ships)
@@ -751,6 +762,11 @@ SlashCmdList["FUIHELPEDXP"] = function(msg)
             -- itself and does nothing at all otherwise, which is also why the
             -- matching option is hidden from the page in that state.
             print("  glue objective icons: " .. (db.rxpBoxLock ~= false and "on" or "off"))
+            if ns.RestedXP and ns.RestedXP.CollapseState then
+                local c, fold, hh, bh = ns.RestedXP.CollapseState()
+                print(("  collapse: %s (fold %.2f, header %s, body %s)"):format(
+                    tostring(c), tonumber(fold) or 0, tostring(hh), tostring(bh)))
+            end
         end
         print("  theme in RXP: " .. tostring(theme))
         print("  follow accent: " .. (db.themeFollowAccent and "on" or "off"))
@@ -758,6 +774,10 @@ SlashCmdList["FUIHELPEDXP"] = function(msg)
         print("  meters: " .. (db.rxpMeters and "on" or "off"))
         if on then
             print("  custom arrow: " .. (db.rxpArrow and "on (" .. tostring(db.rxpArrowStyle) .. ")" or "off"))
+            print("  WaypointUI: " .. ((ns.WaypointAvailable and ns.WaypointAvailable()) and "yes" or "no"))
+            if db.rxpArrowStyle == "WAYPOINT" and ns.WaypointStatus then
+                print("  waypoint: " .. tostring(ns.WaypointStatus()))
+            end
             print("  eta: " .. (db.rxpArrowETA ~= false and "on" or "off"))
             print("  arrow shadow: " .. (db.rxpArrowShadow
                 and ("on (" .. tostring(db.rxpArrowShadowSize or 6) .. " px)") or "off"))

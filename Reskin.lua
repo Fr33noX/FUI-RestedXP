@@ -181,6 +181,169 @@ local W   -- the window
 local pools = { text = {}, bar = {}, hit = {}, tex = {}, num = {}, seg = {} }
 local used
 
+-- ---------------- Collapse (click the zone name) ----------------
+-- A left click on the window's header (the zone-name strip, every layout)
+-- collapses the body under it: the window folds down to the header alone,
+-- then unfolds back. One state and one animation for every layout, because
+-- all six render into the same W and end their pass with a height:
+-- their SetHeight goes through R.SetBodyHeight here, which reports the
+-- body's full height first (the collapse reads it) and then clamps the
+-- frame to header + body*(1-fold). The extra W.content clip keeps the
+-- body's pooled pieces (textures pinned to the frame's TOPLEFT) inside the
+-- visible layout while the frame is tall again during the animation.
+-- The 0.22s ease-out is the same curve the step cards use.
+local Ease
+Ease = function(p) return 1 - (1 - p) * (1 - p) end   -- forward decl; the card
+                     -- transitions' own copy below stays the single truth
+R.collapsed = false
+R.collapseFold = 0          -- 0 open .. 1 collapsed
+local collapseAnim          -- OnUpdate driver while a fold runs
+local collapseClickAt       -- mouse-down time: a click, not a drag
+local collapseDownX, collapseDownY  -- window's corner at the down (drag check)
+local collapseBodyH = 0     -- last reported body height (0 = never drawn)
+local COLLAPSE_L = 22       -- left reserve for the +/- switch: 18px button + 4 margin
+
+local function CollapseHeaderH()
+    -- The header's own height band: the click-catcher covers it (each
+    -- renderer sets W.header:SetHeight), so its height IS the answer.
+    if W and W.header and W.header.GetHeight then return W.header:GetHeight() or 0 end
+    return 0
+end
+
+-- The +/- switch: a click target on the header's left end, right before
+-- the zone text, so the fold has an obvious handle in every layout (the
+-- header itself keeps the click toggle too). Built once, repositioned per
+-- pass; every renderer leaves it a COLLAPSE_L reserve. The
+-- label is a plain hyphen: the prettier minus sign U+2212 has no glyph in
+-- the client's fonts and rendered as nothing. The label gets a real font
+-- here -- a FontString without SetFont shows no text at all, which left
+-- the button invisible (no Normal texture to fall back on).
+local function CollapseButton()
+    if not W then return nil end
+    if W.collapseBtn then return W.collapseBtn end
+    local b = CreateFrame("Button", nil, W.header)
+    b:SetSize(18, 18)
+    b:SetFrameLevel((W.header:GetFrameLevel() or 0) + 3)   -- over the drag strip
+    b:RegisterForClicks("LeftButtonUp")
+    b.label = b:CreateFontString(nil, "OVERLAY")
+    b.label:SetAllPoints()
+    b.label:SetJustifyH("CENTER")
+    b.label:SetJustifyV("MIDDLE")
+    ns.ApplyFont(b.label, nil, 15, "OUTLINE")
+    b.label:SetTextColor(1, 1, 1, 1)
+    b.label:SetShadowOffset(1, -1)
+    b.label:SetShadowColor(0, 0, 0, 0.8)
+    b:SetHighlightTexture("Interface\\Buttons\\WHITE8X8")
+    b:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.15)
+    b:SetScript("OnClick", function() R.ToggleCollapse() end)
+    b:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(R.collapsed and "Show the guide" or "Hide the guide")
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    b.label:SetText(R.collapsed and "+" or "-")
+    b.label:Show()
+    W.collapseBtn = b
+    return b
+end
+
+local function PlaceCollapseButton()
+    local b = CollapseButton()
+    if not (b and W and W.header) then return end
+    -- Left end, before the zone text (which every renderer starts past
+    -- COLLAPSE_L), centred on the title itself: each renderer hands its
+    -- title string over in W.collapseAnchorFs, so the switch sits on the
+    -- text's middle whatever the header band around it holds (Frameless'
+    -- underline, Rail's padding). Without an anchor (Zygor's centred
+    -- title) it parks top-left, centred on the header band instead.
+    b:ClearAllPoints()
+    local anchor = W.collapseAnchorFs
+    if anchor and anchor.IsShown and anchor:IsShown() then
+        b:SetPoint("RIGHT", anchor, "LEFT", -4, 0)
+    else
+        local header = CollapseHeaderH()
+        b:SetPoint("TOPLEFT", W, "TOPLEFT", 2, -math.max(2, (header - 18) / 2))
+    end
+    b:SetShown(W:IsShown())
+    if b.label:GetText() ~= (R.collapsed and "+" or "-") then
+        b.label:SetText(R.collapsed and "+" or "-")
+    end
+end
+
+function R.SetBodyHeight(h)
+    -- A persisted "collapsed" state is only a wish until the first pass
+    -- confirms it: the fold starts fully closed if no animation is running,
+    -- so a /reload reopens nothing and the next click unfolds.
+    if R.collapsed and R.collapseFold < 1 and not R.collapseAnimating then
+        R.collapseFold = 1
+    end
+    local header = CollapseHeaderH()
+    if R.collapseFold > 0 and header > 0 and h and h > 0 then
+        -- Remember the FULL height this pass reports: it is the unfold
+        -- animation's target. It must never be confused with the height we
+        -- render, or a collapsed window would report a zero body and the
+        -- unfold click would do nothing (that was the "nothing happens").
+        collapseBodyH = math.max(h, collapseBodyH)
+        local shown = math.max(1, header + (h - header) * (1 - R.collapseFold))
+        W:SetHeight(shown)
+    elseif h and h > 0 then
+        collapseBodyH = h
+        W:SetHeight(h)
+    else
+        collapseBodyH = 0
+        W:SetHeight(h or 0)
+    end
+    -- Keep the pooled body pieces (pinned to the frame's TOP corners)
+    -- inside the frame while it folds: a clip, not a hide, so the fold
+    -- reads as a curtain falling rather than pieces popping out.
+    if W.content and W.content.SetClipsChildren then
+        W.content:SetClipsChildren(R.collapseFold > 0)
+    end
+    PlaceCollapseButton()
+end
+local function CollapseApply()
+    -- Re-render into the current fold (the renderers read it for their
+    -- heights and alphas); re-drawing is what animates, as for the cards.
+    R.Skin()
+end
+
+function R.ToggleCollapse()
+    local header = CollapseHeaderH()
+    if not (W and W:IsShown() and header and header > 0 and collapseBodyH > 0) then return end
+    R.collapsed = not R.collapsed
+    local db = DB()
+    if db then db.rxpWindowCollapsed = R.collapsed end
+    local from, to = R.collapseFold, R.collapsed and 1 or 0
+    if from ~= to then
+        -- The fold follows a GetTime clock, Ease curve in: re-rendering on
+        -- every frame is what animates, exactly like a leaving step card.
+        R.collapseAnimating = true
+        local t0 = GetTime()
+        R.anim = R.anim or CreateFrame("Frame")
+        R.anim:SetScript("OnUpdate", function(self)
+            local k = math.min(1, (GetTime() - t0) / 0.22)
+            R.collapseFold = from + (to - from) * Ease(k)
+            if k >= 1 then
+                R.collapseFold = to
+                self:SetScript("OnUpdate", nil)
+                R.collapseAnimating = nil
+            end
+            R.Skin()
+        end)    else
+        CollapseApply()
+    end
+end
+
+-- Collapse internals for /status: collapsed wish, fold 0..1, the header's
+-- own height band and the last full body height reported. A fold that
+-- never moves with a body of 0 means the renderers never complete a pass
+-- (their SetBodyHeight is the last call); a header of 0 means the click
+-- catcher has no band to catch with.
+function R.CollapseState()
+    return R.collapsed, R.collapseFold, CollapseHeaderH(), collapseBodyH
+end
+
 local function Take(kind, make)
     used[kind] = (used[kind] or 0) + 1
     local pool = pools[kind]
@@ -407,6 +570,24 @@ local function BuildWindow()
     -- Header: RestedXP's own handlers (move, Alt+drag resize, right-click menu).
     W.header = CreateFrame("Frame", nil, W)
     W.header:EnableMouse(true)
+    W.header:HookScript("OnMouseDown", function(_, button)
+        if button ~= "LeftButton" then return end
+        collapseClickAt = GetTime()
+        collapseDownX, collapseDownY = W:GetLeft(), W:GetTop()
+    end)
+    W.header:HookScript("OnMouseUp", function(_, button)
+        if button ~= "LeftButton" or not collapseClickAt then return end
+        local dt = GetTime() - collapseClickAt
+        local moved = false
+        if collapseDownX then
+            local nx, ny = W:GetLeft(), W:GetTop()
+            moved = math.abs((nx or 0) - collapseDownX) > 0.5 or math.abs((ny or 0) - collapseDownY) > 0.5
+        end
+        if dt < 0.28 and not moved and W.header:IsMouseOver() then
+            R.ToggleCollapse()
+        end
+        collapseClickAt, collapseDownX, collapseDownY = nil, nil, nil
+    end)
     W.header:SetScript("OnMouseDown", function(_, button)
         local rxp = _G.RXPFrame
         if button == "RightButton" then
@@ -625,26 +806,42 @@ end
 -- The "Enemy Names" colour as RRGGBB.
 local function EnemyHex() return SettingHex("Enemy", { 1, 0.341, 0.133 }) end
 
+-- The "Friendly Names" colour (friendly NPC and unit names, RestedXP's
+-- green #00FF25) as RRGGBB. 8-Bit keeps its own NPC colour for these.
+local function FriendlyHex()
+    if Layout() == "BIT8" then return SettingHex("Npc", { 0.49, 1, 0.416 }) end
+    return SettingHex("Friendly", { 0, 1, 0.145 })
+end
+
+-- The "Notes & Warnings" colour (RestedXP's yellow #FCDC00) as RRGGBB.
+local function WarnHex() return SettingHex("Warn", { 0.988, 0.863, 0 }) end
+
 -- A colour code pattern for RRGGBB, any letter case.
 local function HexPattern(hex)
     return "|c%x%x" .. hex:gsub("%a", function(ch) return "[" .. ch:upper() .. ch:lower() .. "]" end)
 end
 
 -- Enemy and item names: RestedXP colours enemies, items to loot and items
--- to pick up with its own colours (#FF5722, #00BCD4, #DB2EEF by default).
--- The "Enemy & Item Names" colour is written into all three settings (so
--- RestedXP's own text uses it after a /reload), and swapped in live in the
--- Frameless text meanwhile.
+-- to pick up with its own colours (#FF5722, #00BCD4, #DB2EEF by default),
+-- friendlies green (#00FF25) and warnings yellow (#FCDC00). Each layout's
+-- own colours are written into all five settings (so RestedXP's own text
+-- uses them after a /reload), and swapped in live meanwhile. Entries
+-- without their own `hex` share the "Enemy & Item Names" colour.
 local NAME_COLORS = {
     { key = "textEnemyColor", default = "ff5722" },
     { key = "textLootColor", default = "00bcd4" },
     { key = "textPickColor", default = "db2eef" },
+    { key = "textFriendlyColor", default = "00ff25", hex = FriendlyHex },
+    { key = "textWarnColor", default = "fcdc00", hex = WarnHex },
 }
 local rxpHex = {}   -- what RestedXP's text uses this session, per setting
 
 -- What a name colour setting becomes: the enemy colour (8-Bit: items have
--- their own).
+-- their own), the friendly colour for friendly names, the warn colour for
+-- notes and warnings.
 local function KeyHex(key)
+    if key == "textFriendlyColor" then return FriendlyHex() end
+    if key == "textWarnColor" then return WarnHex() end
     if Layout() == "BIT8" and key ~= "textEnemyColor" then return SettingHex("Item", { 0.247, 0.816, 1 }) end
     return EnemyHex()
 end
@@ -656,7 +853,9 @@ local function KeyAlpha(key)
     local c, p = DB(), LAYOUTS[Layout()]
     local prefix = p .. "Enemy"
     if key == "textFriendlyColor" then
-        prefix = p .. "Npc"
+        prefix = (Layout() == "BIT8") and (p .. "Npc") or (p .. "Friendly")
+    elseif key == "textWarnColor" then
+        prefix = p .. "Warn"
     elseif Layout() == "BIT8" and key ~= "textEnemyColor" then
         prefix = p .. "Item"
     end
@@ -671,7 +870,7 @@ function R.SyncEnemyColor()
             local current = type(profile[nc.key]) == "string" and profile[nc.key]:sub(-6)
             rxpHex[nc.key] = (current or nc.default):lower()
         end
-        profile[nc.key] = "ff" .. KeyHex(nc.key)
+        profile[nc.key] = "ff" .. (nc.hex and nc.hex() or KeyHex(nc.key))
     end
 end
 
@@ -686,16 +885,16 @@ local function EnemyColor(text)
             text = text:gsub(HexPattern(rxpHex[nc.key]), to)
         end
     end
-    -- 8-Bit: friendly NPCs (RestedXP's green) in its NPC colour.
-    if Layout() == "BIT8" then
-        local profile = RXPProfile()
-        local friendly = profile and type(profile.textFriendlyColor) == "string" and profile.textFriendlyColor:sub(-6):lower()
-        local to = "|c" .. KeyAlpha("textFriendlyColor") .. SettingHex("Npc", { 0.49, 1, 0.416 })
-        text = text:gsub(HexPattern("00ff25"), to)
-        if friendly and friendly ~= "00ff25" then text = text:gsub(HexPattern(friendly), to) end
-    end
+    -- Friendly names and warnings ride the main loop above (KeyHex points
+    -- them at their own colours, 8-Bit names at its NPC colour).
     return text
 end
+
+-- The name-colour swap alone (no icon resizing), for text leaving this
+-- window: WaypointUI's waypoint label. RestedXP parses its guide text
+-- once, so without this the pushed label keeps yesterday's colours until
+-- a /reload; swapped here it follows the options live, like our window.
+function R.RecolorNames(text) return EnemyColor(text) end
 
 -- Every text: black outline plus a soft shadow straight down.
 local function FLText(font, size, r, g, b, a)
@@ -749,7 +948,8 @@ end
 -- skipped (a click on it), a green wash wipes across with "Skipped", it
 -- slides off to the left, then folds. A step brought back (a right-click)
 -- fades in as its space opens, with an amber wash and "Back" that fade out.
-local function Ease(p) return 1 - (1 - p) * (1 - p) end
+-- Ease re-declared here would shadow the collapse block's forward one;
+-- keep the card transitions reading the SAME curve.
 local function Overshoot(p) local q = p - 1; return 1 + 2.70158 * q * q * q + 1.70158 * q * q end
 local function Span(a, from, len) return math.min(1, math.max(0, (a - from) / len)) end
 
@@ -959,10 +1159,11 @@ function R.RenderFrameless()
     fl.zone:SetText(zone)
     local countW = (fl.count:GetStringWidth() or 0) + 8
     local levelW = levels and ((fl.level:GetStringWidth() or 0) + 5) or 0
-    fl.zone:SetWidth(math.max(20, math.min((fl.zone:GetStringWidth() or 0) + 2, FL_W - countW - levelW)))
+    fl.zone:SetWidth(math.max(20, math.min((fl.zone:GetStringWidth() or 0) + 2, FL_W - COLLAPSE_L - countW - levelW)))
     local zoneH = fl.zone:GetStringHeight() or c.zone
     fl.zone:ClearAllPoints()
-    fl.zone:SetPoint("TOPLEFT", W, "TOPLEFT", 0, y)
+    fl.zone:SetPoint("TOPLEFT", W, "TOPLEFT", COLLAPSE_L, y)
+    W.collapseAnchorFs = fl.zone   -- the switch centres on this title
     fl.level:ClearAllPoints()
     fl.level:SetPoint("BOTTOMLEFT", fl.zone, "BOTTOMRIGHT", 5, 2)   -- same baseline
     fl.count:ClearAllPoints()
@@ -1193,7 +1394,7 @@ function R.RenderFrameless()
             else item:Hide() end
         end
     end
-    W:SetHeight(-y)
+    R.SetBodyHeight(-y)
     R.AttachTargets()
 end
 
@@ -1221,7 +1422,7 @@ function R.RenderRail()
 
     -- Header: the guide's zone and progress (GuideHeader). No line under it:
     -- the rail does that job.
-    local y = R.GuideHeader(c, st, RL_W, PAD, 0)
+    local y = R.GuideHeader(c, st, RL_W, PAD + COLLAPSE_L, 0)
     R.Header(y)
 
     local function Hover(on)
@@ -1561,6 +1762,7 @@ function R.GuideHeader(c, st, width, pad, y)
     local zoneH = fl.zone:GetStringHeight() or c.zone
     fl.zone:ClearAllPoints()
     fl.zone:SetPoint("TOPLEFT", W, "TOPLEFT", pad, y)
+    W.collapseAnchorFs = fl.zone   -- the switch centres on this title
     fl.level:ClearAllPoints()
     fl.level:SetPoint("BOTTOMLEFT", fl.zone, "BOTTOMRIGHT", 5, 2)   -- same baseline
     fl.count:ClearAllPoints()
@@ -1587,7 +1789,7 @@ function R.Finish(y)
             else item:Hide() end
         end
     end
-    W:SetHeight(-y)
+    R.SetBodyHeight(-y)
     R.AttachTargets()
 end
 
@@ -1648,12 +1850,13 @@ function R.RenderTimeline()
         pillW = (W.pillText:GetStringWidth() or 20) + 10
     end
     W.name:ClearAllPoints()
-    W.name:SetPoint("TOPLEFT", W, "TOPLEFT", TL_PAD, y)
+    W.name:SetPoint("TOPLEFT", W, "TOPLEFT", TL_PAD + COLLAPSE_L, y)
+    W.collapseAnchorFs = W.name   -- the switch centres on this title
     ns.ApplyFont(W.percent, c.bold, c.zone + 1, "OUTLINE")
     W.percent:SetTextColor(c.pctCol[1], c.pctCol[2], c.pctCol[3], c.pctCol[4])
     W.percent:SetText("100%")   -- widest, to keep room for it
     local pctW = (W.percent:GetStringWidth() or 40) + 8
-    W.name:SetWidth(math.max(20, math.min((W.name:GetStringWidth() or 0) + 2, width - TL_PAD * 2 - pillW - 6 - pctW)))
+    W.name:SetWidth(math.max(20, math.min((W.name:GetStringWidth() or 0) + 2, width - TL_PAD * 2 - COLLAPSE_L - pillW - 6 - pctW)))
     W.pill:SetShown(levels ~= nil)
     W.pillText:SetShown(levels ~= nil)
     if levels then
@@ -1879,7 +2082,8 @@ function R.RenderTimeline()
             else item:Hide() end
         end
     end
-    W:SetHeight(-y + TL_PAD - 6)
+    R.SetBodyHeight(-y)
+    R.AttachTargets()
 end
 
 -- =====================================================================
@@ -2005,8 +2209,9 @@ function R.RenderCompact()
     local name = FLText(c.bold, c.zone, c.zoneCol[1], c.zoneCol[2], c.zoneCol[3], c.zoneCol[4])
     name:SetWordWrap(false)
     name:SetText(zone)
-    name:SetWidth(math.max(20, math.min((name:GetStringWidth() or 0) + 2, x - PADX - lvlW - 6)))
-    name:SetPoint("LEFT", W, "TOPLEFT", PADX, mid)
+    name:SetWidth(math.max(20, math.min((name:GetStringWidth() or 0) + 2, x - PADX - COLLAPSE_L - lvlW - 6)))
+    name:SetPoint("LEFT", W, "TOPLEFT", PADX + COLLAPSE_L, mid)
+    W.collapseAnchorFs = name   -- the switch centres on this title
     lvl:SetPoint("LEFT", name, "RIGHT", 5, 0)
     local y = -1 - titleH - 1 - 5
 
@@ -2165,7 +2370,7 @@ function R.RenderCompact()
             else item:Hide() end
         end
     end
-    W:SetHeight(-y)
+    R.SetBodyHeight(-y)
     R.AttachTargets()
 end
 
@@ -2235,10 +2440,11 @@ function R.RenderZygor()
     Fill("BACKGROUND", 1, 1, -1, width - 2, titleH, c.headBg)
     local title = FLText(c.bold, c.zone, c.zoneCol[1], c.zoneCol[2], c.zoneCol[3], c.zoneCol[4])
     title:SetWordWrap(false)
-    title:SetWidth(width - 2 * PADX)
+    title:SetWidth(width - 2 * PADX - COLLAPSE_L)
     title:SetJustifyH("CENTER")
     title:SetText(zone)
-    title:SetPoint("CENTER", W, "TOP", 0, -1 - titleH / 2)
+    title:SetPoint("CENTER", W, "TOP", COLLAPSE_L / 2, -1 - titleH / 2)
+    W.collapseAnchorFs = nil   -- centred title: the switch parks top-left
     W.header:ClearAllPoints()
     W.header:SetPoint("TOPLEFT", W, "TOPLEFT", 0, 0)
     W.header:SetPoint("TOPRIGHT", W, "TOPRIGHT", 0, 0)
@@ -2388,7 +2594,7 @@ function R.RenderZygor()
             else item:Hide() end
         end
     end
-    W:SetHeight(-y)
+    R.SetBodyHeight(-y)
     R.AttachTargets()
 end
 
@@ -2555,11 +2761,12 @@ function R.RenderBit()
     local rowH = math.max(zoneFs:GetStringHeight() or c.zone, pctFs:GetStringHeight() or c.zone, chipH)
     local mid = y - rowH / 2
     local zoneW = math.max(20, math.min((zoneFs:GetStringWidth() or 0) + 2,
-        width - 28 - (pctFs:GetStringWidth() or 30) - 8 - (levels and chipW + 8 or 0)))
+        width - 28 - COLLAPSE_L - (pctFs:GetStringWidth() or 30) - 8 - (levels and chipW + 8 or 0)))
     zoneFs:SetWidth(zoneW)
-    zoneFs:SetPoint("LEFT", W, "TOPLEFT", x0 + 14, mid)
+    zoneFs:SetPoint("LEFT", W, "TOPLEFT", x0 + 14 + COLLAPSE_L, mid)
+    W.collapseAnchorFs = zoneFs   -- the switch centres on this title
     if chipFs then
-        local cx = x0 + 14 + zoneW + 8
+        local cx = x0 + 14 + COLLAPSE_L + zoneW + 8
         Fill("ARTWORK", 1, cx, mid + chipH / 2, chipW, chipH, c.done)
         chipFs:SetPoint("CENTER", W, "TOPLEFT", cx + chipW / 2, mid)
     end
@@ -2841,7 +3048,7 @@ function R.RenderBit()
             else item:Hide() end
         end
     end
-    W:SetHeight(H + 16)
+    R.SetBodyHeight(H + 16)
     R.AttachTargets()
 end
 
@@ -2908,7 +3115,8 @@ end
 function R.AttachTargets()
     local layout = Layout()
     if not (W and W:IsShown() and Enabled() and (layout == "FRAMELESS" or layout == "RAIL"
-        or layout == "COMPACT" or layout == "ZYGOR" or layout == "BIT8")) then return end
+        or layout == "COMPACT" or layout == "ZYGOR" or layout == "BIT8"
+        or layout == "TIMELINE")) then return end
     if InCombatLockdown() then attachPending = true; return end
     attachPending = false
     if BoxesFree() then
@@ -2976,13 +3184,23 @@ local NEAR, CLOSE = 100, 30   -- Card: red above NEAR, yellow down to CLOSE, gre
 local card
 
 local function ArrowStyle()
-    local s = DB().rxpArrowStyle
-    if s == "CHEVRON" or s == "CARD" or s == "CLASSIC" or s == "ZYGOR" or s == "RAIL" or s == "RAILC" then return s end
     local layout = Layout()
-    if layout == "DEFAULT" then return nil end   -- RestedXP's own
-    if layout == "ZYGOR" then return "ZYGOR" end
-    if layout == "RAIL" then return "RAIL" end   -- this theme's own pointer
-    return layout == "TIMELINE" and "CARD" or "CHEVRON"
+    local function LayoutDefault()
+        if layout == "DEFAULT" then return nil end   -- RestedXP's own
+        if layout == "ZYGOR" then return "ZYGOR" end
+        if layout == "RAIL" then return "RAIL" end   -- this theme's own pointer
+        return layout == "TIMELINE" and "CARD" or "CHEVRON"
+    end
+    local s = DB().rxpArrowStyle
+    if s == "WAYPOINT" then
+        -- Without WaypointUI installed there is nothing external to drive:
+        -- fall back to the layout's own arrow, never RestedXP's stock one.
+        -- (WaypointUI arriving late re-hides the card through the ticker.)
+        if ns.WaypointAvailable and ns.WaypointAvailable() then return "WAYPOINT" end
+        return LayoutDefault()
+    end
+    if s == "CHEVRON" or s == "CARD" or s == "CLASSIC" or s == "ZYGOR" or s == "RAIL" or s == "RAILC" then return s end
+    return LayoutDefault()
 end
 
 local function ArrowOn()
@@ -3068,6 +3286,7 @@ local function ArrowText(text)
     if not (card and ArrowOn()) then return end
     local af = _G.RXPG_ARROW
     local style = ArrowStyle()
+    if style == "WAYPOINT" then return end   -- hidden card: nothing to label
     if type(text) ~= "string" or IsSecret(text) then text = "" end
     -- The unit is yd or m (the meters option rewrites RestedXP's raw text,
     -- and a stale "m" can linger until its next distance change): the
@@ -3287,6 +3506,24 @@ function R.SkinArrow()
             card:Hide()
             af.texture:SetAlpha(1)
             af.text:SetAlpha(1)
+        end
+        if ns.WaypointTick then ns.WaypointTick() end   -- style left: take our waypoint down
+        return
+    end
+    if ArrowStyle() == "WAYPOINT" then
+        -- WaypointUI drives: no card drawn, and RestedXP's own arrow
+        -- visuals hidden too (the frame itself stays: drag handle and the
+        -- target source MapRouteSpot reads). Without WaypointUI installed
+        -- the stock arrow is left up instead -- an arrow is never silently
+        -- taken away.
+        if card then card:Hide() end
+        if ns.WaypointAvailable and ns.WaypointAvailable() then
+            if af.texture then af.texture:SetAlpha(0) end
+            if af.text then af.text:SetAlpha(0) end
+            if ns.WaypointTick then ns.WaypointTick() end
+        else
+            if af.texture then af.texture:SetAlpha(1) end
+            if af.text then af.text:SetAlpha(1) end
         end
         return
     end
@@ -3574,6 +3811,8 @@ end
 -- =====================================================================
 function R.Skin(force)
     if not Enabled() then return end
+    -- A layout switch must not inherit the previous title's anchor.
+    if W then W.collapseAnchorFs = nil end
     -- RestedXP builds its Active Targets / Items boxes during its own start-up.
     for _, box in ipairs(BOXES) do
         local f = _G[box.name]
@@ -3685,6 +3924,8 @@ end
 
 table.insert(ns.onLogin, function()
     local db = DB()
+    -- The collapse survives a /reload: a collapsed window stays collapsed.
+    if db.rxpWindowCollapsed then R.collapsed = true end
     -- One-time: more listed steps (6, was 3).
     if not db.rxpTallV1 then
         if db.rxpUpcoming == 3 then db.rxpUpcoming = 6 end

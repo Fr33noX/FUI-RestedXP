@@ -35,6 +35,11 @@ is held this way, both arrows cannot coexist.
    global settings search, window scale (Scale
    slider, 60–130%), resizable window — with no dependency
    beyond RestedXP Guides.
+4. **WaypointUI support (optional)**: when WaypointUI is installed, the
+   "WaypointUI (external arrow)" style hides every arrow here and drives
+   WaypointUI's waypoint from the guide's current step instead -- with the
+   waypoint label following the name colors. Without WaypointUI, the
+   layout's own arrow shows.
 
 ## Installation
 
@@ -93,7 +98,9 @@ The **Reset to Defaults** button (*Reskin* page) restores **all** of the
   `ZYGOR` (Zygor-style arrow + time remaining), `RAIL` (bent needle head,
   dark half = relief; default of the Rail layout) or `RAILC` (the same
   idea inside a ring, two-facet needle). Card is tinted by
-  distance (red > 100, yellow, green < 30).
+  distance (red > 100, yellow, green < 30). `WAYPOINT` hides every arrow
+  here and drives WaypointUI's waypoint instead (needs WaypointUI installed;
+  without it, RestedXP's stock arrow stays up).
 - `rxpMeters`: arrow distance in "m" (1 yd = 1 m in WoW: only
   the label changes). Works with the engine arrow (Custom Arrow on)
   **and** with RXP's stock arrow (Custom Arrow off — live
@@ -103,6 +110,11 @@ The **Reset to Defaults** button (*Reskin* page) restores **all** of the
   window and follow it in every layout. When unchecked, drag them with
   left-drag anywhere on screen and they stay there — in every
   layout and across sessions (position saved in `rxpBoxFree`).
+- Per-layout **Friendly Names** (RestedXP's green unit names) and
+  **Notes & Warnings** (its yellow) colors, on each layout's appearance
+  page (8-Bit reuses its NPC color for the names). They recolor our
+  window live and are also written to RestedXP's own settings, so its
+  window follows after a /reload.
 - `rxpArrowETA` (default: true): remaining time ("1:23" / "45s", in
   yellow) on **all** custom arrows (Chevron, Card, Classic,
   Zygor-style, Rail, Rail Compass). Off = distance only.

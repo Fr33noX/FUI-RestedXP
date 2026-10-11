@@ -293,6 +293,12 @@ local function LookPage(name, p, extra, noFonts)
                 -- the live recolour on our frames is an 8-digit escape, so
                 -- the stored opacity shows there (and after /reload).
                 Color("Enemy & Item Names", p .. "Enemy", true),
+                -- 8-Bit edits its existing NPC colour here (same key as its
+                -- 8-BIT block below used to); every other layout gets its own.
+                Color("Friendly Names", (p == "rxpBt") and "rxpBtNpc" or (p .. "Friendly"), true,
+                    "Friendly NPC and unit names (RestedXP's green), in this layout. Also written to RestedXP's own settings, so its window follows after a /reload."),
+                Color("Notes & Warnings", p .. "Warn", true,
+                    "Notes and warnings (RestedXP's yellow), in this layout. Also written to RestedXP's own settings, so its window follows after a /reload."),
             },
         }
         if extra then
@@ -317,6 +323,28 @@ end
 -- `buttons = true` is this file's own marker telling Build not to pair a row
 -- with the next one (which also gives it the whole content width).
 local CHANGELOG = {
+    { "1.1.1", "2026-10-11",
+        "Added: a +/- switch at the header's left, before the zone name, "
+        .. "in every layout: minus folds the guide down to its header, plus "
+        .. "unfolds it. Clicking the header itself still toggles too.",
+        "Added: per-layout Friendly Names and Notes & Warnings colors, on "
+        .. "each layout's COLORS page (8-Bit reuses its NPC color for the "
+        .. "names). They recolor the window live and are written to "
+        .. "RestedXP's own settings, so its window follows after a /reload, "
+        .. "and the WaypointUI waypoint label follows them within a second.",
+        "Added: WaypointUI support -- a \"WaypointUI (external arrow)\" "
+        .. "style: it hides every arrow here and drives WaypointUI's "
+        .. "waypoint from the guide's current step instead, with the "
+        .. "waypoint label following the name colors.",
+        "Changed: with that style but no WaypointUI installed, the "
+        .. "layout's own arrow now shows instead of RestedXP's stock one.",
+        "Changed: the route is now on by default, on the world map and "
+        .. "the minimap, with 6 Upcoming Markers.",
+        "Fixed: the objective icon boxes never gluing under the guide "
+        .. "window on Timeline, where the glue never ran.",
+        "Fixed: the stock arrow staying up next to WaypointUI's when "
+        .. "WaypointUI loads after the guide.",
+    },
     { "1.1.0", "2026-10-06",
         "Added: a route on the world map, on the MAP options page and off by "
         .. "default. A line from you to the guide's current target with a marker "
@@ -593,7 +621,8 @@ PAGES = {   -- assigned to the local declared above (RefreshPageList closes over
                         { label = "Zygor-style (arrowhead)", value = "ZYGOR" },
                         { label = "Rail (this theme's pointer)", value = "RAIL" },
                         { label = "Rail Compass (emblem)", value = "RAILC" },
-                    }, "The waypoint arrow's look, in every layout -- changing it changes only the arrow. Layout's own: Chevron for Frameless and Compact, Card for Timeline, the Zygor-style arrowhead for Zygor-style, RestedXP's stock arrow for DEFAULT. Card and the Zygor-style arrowhead take their layout's colors; Card colors by distance (red over 100, yellow, green under 30). Rail is the default for the Rail layout: a folded arrowhead whose darker half gives it its relief. Rail Compass is the same shading wrapped in a ring -- handsome, but the ring disappears at 36 px, so it suits a still arrow better than a moving one."),
+                        { label = "WaypointUI (external arrow)", value = "WAYPOINT" },
+                    }, "The waypoint arrow's look, in every layout -- changing it changes only the arrow. Layout's own: Chevron for Frameless and Compact, Card for Timeline, the Zygor-style arrowhead for Zygor-style, RestedXP's stock arrow for DEFAULT. Card and the Zygor-style arrowhead take their layout's colors; Card colors by distance (red over 100, yellow, green under 30). Rail is the default for the Rail layout: a folded arrowhead whose darker half gives it its relief. Rail Compass is the same shading wrapped in a ring -- handsome, but the ring disappears at 36 px, so it suits a still arrow better than a moving one. WaypointUI (external arrow): hides every arrow here and drives WaypointUI's waypoint from the guide's current step instead -- needs WaypointUI installed; without it the layout's own arrow shows instead."),
                     Toggle("Meters (m) on the Arrow", "rxpMeters",
                         "Rewrites the arrow's distance label from yards to meters. World of Warcraft's yard and meter are the same distance (1:1), so only the label changes, never the numbers."),
                 },
@@ -679,7 +708,6 @@ PAGES = {   -- assigned to the local declared above (RefreshPageList closes over
                 -- escapes on our frames, so the stored opacity shows.
                 -- (RestedXP's own profile write stays 6-digit.)
                 Color("Item Names", "rxpBtItem", true),
-                Color("NPC Names", "rxpBtNpc", true),
                 Color("Verbs (Kill, Loot...)", "rxpBtVerb", true),
             },
         },
@@ -702,7 +730,7 @@ PAGES = {   -- assigned to the local declared above (RefreshPageList closes over
             { "ROUTE",
                 left = {
                     Toggle("Route on the world map", "rxpMapRoute",
-                        "Draws the guide's route straight on the world map: a line from you to the current target, a marker on it, and (with Upcoming Markers below) the following objectives in the chain. Everything is drawn in the color chosen on the Theme page -- the live accent while \"Follow Accent\" is on there -- so it changes when that page changes, and never with the overlay colors below. This is a bearing, not a path: the game gives addons no roads to follow, so the line points at the objective rather than tracing a route to it. Off by default -- it does not touch the guide window, and turning it off removes everything it drew."),
+                        "Draws the guide's route straight on the world map: a line from you to the current target, a marker on it, and (with Upcoming Markers below) the following objectives in the chain. Everything is drawn in the color chosen on the Theme page -- the live accent while \"Follow Accent\" is on there -- so it changes when that page changes, and never with the overlay colors below. This is a bearing, not a path: the game gives addons no roads to follow, so the line points at the objective rather than tracing a route to it. On by default -- it does not touch the guide window, and turning it off removes everything it drew."),
                     {
                         type = "slider", text = "Chain Visibility", min = 0.15, max = 1, step = 0.05,
                         tooltip = "How present the chain of upcoming steps is, against the current target which is always fully drawn. The first link of the chain is drawn at this value and each following one fades towards half of it, spread over however many markers Upcoming Markers asks for -- two markers or six both start bright and end dim. A link's line, chevrons and marker all share that one alpha. Lower it to keep the route readable on busy maps, raise it when planning further ahead.",
@@ -718,7 +746,7 @@ PAGES = {   -- assigned to the local declared above (RefreshPageList closes over
                 },
                 right = {
                     Toggle("Route on the minimap", "rxpMiniRoute",
-                        "The same route on the minimap: a line from you -- the minimap is centred on you -- to the current target, the chevrons running along it, and the marker on it. A target further out than the minimap can show puts that marker ON THE RIM, which is what a rim marker means: that way, past this edge. The upcoming steps do NOT ring here: the glass keeps the current target and nothing else -- those extra dots read as noise in play, so the chain is drawn on the world map only. Same color and same flow speed as the world map route, and it turns with the minimap when \"Rotate minimap\" is on. It draws whether the map is open or not. Off by default: the minimap is a surface this addon does not own."),
+                        "The same route on the minimap: a line from you -- the minimap is centred on you -- to the current target, the chevrons running along it, and the marker on it. A target further out than the minimap can show puts that marker ON THE RIM, which is what a rim marker means: that way, past this edge. The upcoming steps do NOT ring here: the glass keeps the current target and nothing else -- those extra dots read as noise in play, so the chain is drawn on the world map only. Same color and same flow speed as the world map route, and it turns with the minimap when \"Rotate minimap\" is on. It draws whether the map is open or not. On by default: the minimap is a surface this addon does not own."),
                     {
                         type = "slider", text = "Upcoming Markers", min = 0, max = 6, step = 1,
                         tooltip = "How many markers to draw after the current target, on the world map, which draws the chain in full. The minimap draws the current target alone -- extra rings there read as noise -- so this setting leaves it alone. The chain looks past steps that carry no position of their own until the count is filled, so this number is what you should see on the map; a step on a map with no shared continent, and two steps resolving to the same place, still collapse into the previous marker. Each upcoming marker reports the WHOLE route to it -- its distance and its arrival time add up along the chain, the way you would actually walk them. /fuirxp status reports chain=drawn/wanted.",

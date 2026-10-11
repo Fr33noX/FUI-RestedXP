@@ -219,6 +219,9 @@ local function CurrentSpot()
     return nil
 end
 
+-- Waypoint bridge: the same target the route draws, for WaypointUI's
+-- waypoint instead of our arrow. Normalized 0..1 coordinates, plus a
+-- short label. Nil while RestedXP publishes nothing to head for.
 -- ---------------- The corpse run ----------------
 -- While the player is a ghost RestedXP publishes no target: its arrow
 -- goes quiet, and the route that matters is the one back to the body.
@@ -800,6 +803,57 @@ local function Instructions(e, stepObj)
         end
     end
     return out
+end
+
+-- The waypoint label: the step's own headline, same rule as the map
+-- tooltip -- element title, step arrow text / title, else the first
+-- instruction line. The bare step number is the last resort, so the
+-- waypoint reads what the guide is about, not where it sits in it.
+local function SpotLabel(e, step)
+    local head = (type(e) == "table") and OneLine(e.title) or nil
+    if not head and type(step) == "table" then
+        head = OneLine(step.arrowtext) or OneLine(step.title)
+    end
+    if not head then
+        local all = Instructions(e, step)
+        head = all and all[1]
+    end
+    if type(head) ~= "string" or head == "" then
+        local at = ActiveIndex()
+        return (at and ("RestedXP Step " .. at) or "RestedXP")
+    end
+    return head
+end
+
+-- Waypoint bridge: the same target the route draws, for WaypointUI's
+-- waypoint instead of our arrow. Normalized 0..1 coordinates, the label
+-- above, and WHICH answer it was (arrow element vs current step -- the
+-- diagnostic needs it: a stale arrow element points at the previous step).
+-- Nil while RestedXP publishes nothing to head for.
+function ns.MapRouteSpot()
+    -- While the player is a ghost the body outranks the guide, exactly as
+    -- in RefreshMap: RestedXP publishes no target from beyond the veil
+    -- (its arrow goes quiet), so a reader of this answer alone used to
+    -- get nil and take the waypoint down -- WaypointUI showed nothing
+    -- while dead. CorpseSpot costs one boolean for a living player.
+    local corpseMap, corpseX, corpseY = CorpseSpot()
+    if corpseMap then
+        return corpseMap, corpseX, corpseY,
+            SpotLabel(CorpseElement(), nil), "corpse"
+    end
+    local af = _G.RXPG_ARROW
+    if af then
+        local id, x, y = SpotArrow(af.element)
+        if id then
+            local step = (type(af.element) == "table") and af.element.step or nil
+            if type(step) ~= "table" or not step.elements then step = CurrentStep() end
+            return id, x, y, SpotLabel(af.element, step), "arrow element"
+        end
+    end
+    local step = CurrentStep()
+    local id2, x2, y2, e = SpotInStep(step)
+    if id2 then return id2, x2, y2, SpotLabel(e, step), "current step" end
+    return nil
 end
 
 -- RestedXP's icon for a step type, handed over exactly as IT formats it
